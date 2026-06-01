@@ -3,53 +3,85 @@
   <link name="base_link">
     <inertial><mass value="1.0"/><inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/></inertial>
     <visual><geometry><box size="0.15 0.15 0.05"/></geometry><material name="dark"><color rgba="0.2 0.2 0.2 1"/></material></visual>
+    
+    <collision>
+      <geometry><box size="0.45 0.45 0.1"/></geometry> </collision>
   </link>
-  <gazebo reference="base_link"><turnGravityOff>true</turnGravityOff><material>Gazebo/DarkGrey</material></gazebo>
+  
+  <gazebo reference="base_link">
+    <turnGravityOff>true</turnGravityOff>
+    <material>Gazebo/DarkGrey</material>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+        <ros><remapping>~/out:=imu/data</remapping></ros>
+        <initial_orientation_as_reference>false</initial_orientation_as_reference>
+      </plugin>
+    </sensor>
+  </gazebo>
 
   <link name="arms"><visual><geometry><box size="0.4 0.02 0.02"/></geometry><material name="grey"><color rgba="0.6 0.6 0.6 1"/></material></visual></link>
   <joint name="arms_x_joint" type="fixed"><parent link="base_link"/><child link="arms"/></joint>
   <link name="arms_y"><visual><geometry><box size="0.02 0.4 0.02"/></geometry><material name="grey"><color rgba="0.6 0.6 0.6 1"/></material></visual></link>
   <joint name="arms_y_joint" type="fixed"><parent link="base_link"/><child link="arms_y"/></joint>
 
-  <macro name="rotor" params="name x y">
-    <link name="${name}">
-      <visual><geometry><cylinder radius="0.08" length="0.01"/></geometry><material name="black"><color rgba="0.1 0.1 0.1 0.5"/></material></visual>
-    </link>
-    <joint name="${name}_joint" type="fixed">
-      <parent link="base_link"/><child link="${name}"/><origin xyz="${x} ${y} 0.03"/>
-    </joint>
-    <gazebo reference="${name}"><turnGravityOff>true</turnGravityOff><material>Gazebo/BlackTransparent</material></gazebo>
-  </macro>
-  
   <link name="rotor_1"><visual><geometry><cylinder radius="0.08" length="0.01"/></geometry><material name="black"><color rgba="0.1 0.1 0.1 0.7"/></material></visual></link>
   <joint name="r1_j" type="fixed"><parent link="base_link"/><child link="rotor_1"/><origin xyz="0.2 0 0.03"/></joint>
-  
   <link name="rotor_2"><visual><geometry><cylinder radius="0.08" length="0.01"/></geometry><material name="black"><color rgba="0.1 0.1 0.1 0.7"/></material></visual></link>
   <joint name="r2_j" type="fixed"><parent link="base_link"/><child link="rotor_2"/><origin xyz="-0.2 0 0.03"/></joint>
-  
   <link name="rotor_3"><visual><geometry><cylinder radius="0.08" length="0.01"/></geometry><material name="black"><color rgba="0.1 0.1 0.1 0.7"/></material></visual></link>
   <joint name="r3_j" type="fixed"><parent link="base_link"/><child link="rotor_3"/><origin xyz="0 0.2 0.03"/></joint>
-  
   <link name="rotor_4"><visual><geometry><cylinder radius="0.08" length="0.01"/></geometry><material name="black"><color rgba="0.1 0.1 0.1 0.7"/></material></visual></link>
   <joint name="r4_j" type="fixed"><parent link="base_link"/><child link="rotor_4"/><origin xyz="0 -0.2 0.03"/></joint>
 
+  <link name="laser_link">
+    <visual><geometry><cylinder radius="0.04" length="0.04"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+  </link>
+  <joint name="laser_joint" type="fixed"><parent link="base_link"/><child link="laser_link"/><origin xyz="0 0 0.05" rpy="0 0 0"/></joint>
+  <gazebo reference="laser_link">
+    <sensor type="ray" name="lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan><horizontal><samples>180</samples><resolution>1</resolution><min_angle>-3.14159</min_angle><max_angle>3.14159</max_angle></horizontal></scan>
+        <range><min>0.1</min><max>4.0</max></range>
+      </ray>
+      <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
+        <ros><remapping>~/out:=scan</remapping></ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>laser_link</frame_name>
+      </plugin>
+    </sensor>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+
   <link name="camera_link"><visual><geometry><box size="0.02 0.05 0.05"/></geometry><material name="red"><color rgba="1 0 0 1"/></material></visual></link>
- <joint name="camera_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="camera_link"/>
-    <origin xyz="0.25 0 0" rpy="0 0.2 0"/> </joint>
+  <joint name="camera_joint" type="fixed"><parent link="base_link"/><child link="camera_link"/><origin xyz="0.25 0 0" rpy="0 0.2 0"/></joint>
+  
   <gazebo reference="camera_link">
-    <sensor type="camera" name="front_camera">
+    <sensor type="depth" name="front_depth_camera">
       <update_rate>30.0</update_rate>
-      <camera name="head">
+      <camera name="front">
         <horizontal_fov>1.396</horizontal_fov>
         <image><width>640</width><height>480</height><format>R8G8B8</format></image>
-        <clip><near>0.02</near><far>300</far></clip>
+        <clip><near>0.1</near><far>10.0</far></clip>
       </camera>
-      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-        <ros><namespace>camera</namespace><remapping>~/image_raw:=image_raw</remapping></ros>
+      <plugin name="depth_camera_controller" filename="libgazebo_ros_camera.so">
+        <ros>
+          <namespace>camera</namespace>
+          <remapping>custom_camera/image_raw:=image_raw</remapping>
+          <remapping>custom_camera/image_depth:=depth/image_raw</remapping>
+          <remapping>custom_camera/camera_info:=camera_info</remapping>
+          <remapping>custom_camera/camera_info_depth:=depth/camera_info</remapping>
+          <remapping>custom_camera/points:=depth/points</remapping>
+        </ros>
         <camera_name>front</camera_name>
         <frame_name>camera_link</frame_name>
+        <min_depth>0.1</min_depth>
+        <max_depth>10.0</max_depth>
       </plugin>
     </sensor>
     <turnGravityOff>true</turnGravityOff>
@@ -62,29 +94,5 @@
       <publish_rate>100.0</publish_rate>
       <robot_base_frame>base_link</robot_base_frame>
     </plugin>
-  </gazebo>
-  <link name="laser_link">
-    <visual><geometry><cylinder radius="0.04" length="0.04"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
-  </link>
-  <joint name="laser_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="laser_link"/>
-    <origin xyz="0 0 0.05" rpy="0 0 0"/>
-  </joint>
-
-  <gazebo reference="laser_link">
-    <sensor type="ray" name="lidar_sensor">
-      <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize> <update_rate>10</update_rate>
-     <ray>
-        <scan><horizontal><samples>180</samples><resolution>1</resolution><min_angle>-3.14159</min_angle><max_angle>3.14159</max_angle></horizontal></scan>
-        <range><min>0.1</min><max>4.0</max></range> </ray>
-      <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
-        <ros><remapping>~/out:=scan</remapping></ros>
-        <output_type>sensor_msgs/LaserScan</output_type>
-        <frame_name>laser_link</frame_name>
-      </plugin>
-    </sensor>
-    <turnGravityOff>true</turnGravityOff>
   </gazebo>
 </robot>

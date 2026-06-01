@@ -31,7 +31,7 @@ def generate_launch_description():
         Node(
             package='gazebo_ros',
             executable='spawn_entity.py',
-            arguments=['-entity', 'drone', '-file', urdf_path, '-x', '0.0', '-y', '0.0', '-z', '1.5'],
+            arguments=['-entity', 'drone', '-file', urdf_path, '-x', '0.0', '-y', '-7.0', '-z', '0.8'],
             output='screen'
         ),
         # Нода компьютерного зрения
