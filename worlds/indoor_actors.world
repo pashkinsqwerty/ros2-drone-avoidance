@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="indoor_world">
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+
+    <model name="room_walls">
+      <static>true</static>
+      <link name="walls">
+        <collision name="wall_1"><pose>10 0 1.5 0 0 0</pose><geometry><box><size>0.2 20 3</size></box></geometry></collision>
+        <visual name="wall_1"><pose>10 0 1.5 0 0 0</pose><geometry><box><size>0.2 20 3</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script></material></visual>
+        
+        <collision name="wall_2"><pose>-10 0 1.5 0 0 0</pose><geometry><box><size>0.2 20 3</size></box></geometry></collision>
+        <visual name="wall_2"><pose>-10 0 1.5 0 0 0</pose><geometry><box><size>0.2 20 3</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script></material></visual>
+        
+        <collision name="wall_3"><pose>0 10 1.5 0 0 0</pose><geometry><box><size>20 0.2 3</size></box></geometry></collision>
+        <visual name="wall_3"><pose>0 10 1.5 0 0 0</pose><geometry><box><size>20 0.2 3</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script></material></visual>
+        
+        <collision name="wall_4"><pose>0 -10 1.5 0 0 0</pose><geometry><box><size>20 0.2 3</size></box></geometry></collision>
+        <visual name="wall_4"><pose>0 -10 1.5 0 0 0</pose><geometry><box><size>20 0.2 3</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Yellow</name></script></material></visual>
+      </link>
+    </model>
+
+    <model name="static_pillar">
+      <static>true</static>
+      <link name="link">
+        <pose>4 0 1.5 0 0 0</pose>
+        <collision name="col"><geometry><cylinder><radius>0.6</radius><length>3</length></cylinder></geometry></collision>
+        <visual name="vis"><geometry><cylinder><radius>0.6</radius><length>3</length></cylinder></geometry><material><ambient>1 0.5 0 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <model name="static_box">
+      <static>true</static>
+      <link name="link">
+        <pose>-4 -4 0.5 0 0 0</pose>
+        <collision name="col"><geometry><box><size>1.5 1.5 1</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>1.5 1.5 1</size></box></geometry><material><ambient>0 0.5 1 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <actor name="actor_1">
+      <skin><filename>walk.dae</filename><scale>1.0</scale></skin>
+      <animation name="walking"><filename>walk.dae</filename><scale>1.0</scale><interpolate_x>true</interpolate_x></animation>
+      <script>
+        <loop>true</loop><auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0</time><pose>6 6 0 0 0 -1.57</pose></waypoint>
+          <waypoint><time>12</time><pose>6 -6 0 0 0 -1.57</pose></waypoint>
+          <waypoint><time>13</time><pose>6 -6 0 0 0 3.14</pose></waypoint>
+          <waypoint><time>25</time><pose>-6 -6 0 0 0 3.14</pose></waypoint>
+          <waypoint><time>26</time><pose>-6 -6 0 0 0 1.57</pose></waypoint>
+          <waypoint><time>38</time><pose>-6 6 0 0 0 1.57</pose></waypoint>
+          <waypoint><time>39</time><pose>-6 6 0 0 0 0</pose></waypoint>
+          <waypoint><time>51</time><pose>6 6 0 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <actor name="actor_2">
+      <skin><filename>walk.dae</filename><scale>1.0</scale></skin>
+      <animation name="walking"><filename>walk.dae</filename><scale>1.0</scale><interpolate_x>true</interpolate_x></animation>
+      <script>
+        <loop>true</loop><auto_start>true</auto_start>
+        <trajectory id="1" type="walking">
+          <waypoint><time>0</time><pose>0 8 0 0 0 -1.57</pose></waypoint>
+          <waypoint><time>16</time><pose>0 -8 0 0 0 -1.57</pose></waypoint>
+          <waypoint><time>17</time><pose>0 -8 0 0 0 1.57</pose></waypoint>
+          <waypoint><time>33</time><pose>0 8 0 0 0 1.57</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <actor name="actor_3">
+      <skin><filename>walk.dae</filename><scale>1.0</scale></skin>
+      <animation name="walking"><filename>walk.dae</filename><scale>1.0</scale><interpolate_x>true</interpolate_x></animation>
+      <script>
+        <loop>true</loop><auto_start>true</auto_start>
+        <trajectory id="2" type="walking">
+          <waypoint><time>0</time><pose>-7 -2 0 0 0 0.5</pose></waypoint>
+          <waypoint><time>15</time><pose>7 5 0 0 0 0.5</pose></waypoint>
+          <waypoint><time>16</time><pose>7 5 0 0 0 -2.64</pose></waypoint>
+          <waypoint><time>31</time><pose>-7 -2 0 0 0 -2.64</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+  </world>
+</sdf>
